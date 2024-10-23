@@ -2,46 +2,62 @@
 
 const playerThreads: { [uuid: string]: string } = {};
 
+async function createThread(botName: string, userUuid: string): Promise<string> {
+    try {
+        const response = await fetch(`https://ai.newit.works/api/v1/workspace/${botName}/thread/new`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer JM2QWSW-FVYM0C0-KBR1MG5-PE3WSKK',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Accept': '*/*'
+            },
+            body: JSON.stringify({ userId: 6 })
+        }).then(res => res.json());
+
+        const threadId = response.data.thread.slug;
+        playerThreads[userUuid] = threadId;
+        console.log(`Thread created with ID: ${threadId} for user ${userUuid}`);
+        return threadId;
+    } catch (e) {
+        console.error("Failed to create thread:", e);
+        throw e;
+    }
+}
+
+async function handleChatMessage(botName: string, threadId: string, message: string) {
+    try {
+        WA.chat.startTyping({ scope: "bubble" });
+
+        const response = await fetch(`https://ai.newit.works/api/v1/workspace/${botName}/thread/${threadId}/chat`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer JM2QWSW-FVYM0C0-KBR1MG5-PE3WSKK'
+            },
+            body: JSON.stringify({
+                message: message,
+                mode: "chat",
+                userId: 6
+            })
+        }).then(res => res.json());
+
+        const chatResponse = response.choices[0]?.message.content;
+        if (!chatResponse) {
+            throw new Error("Custom AI returned no response: " + JSON.stringify(response));
+        }
+        console.log("Custom AI response:", chatResponse);
+
+        WA.chat.sendChatMessage(chatResponse, { scope: "bubble" });
+        WA.chat.stopTyping({ scope: "bubble" });
+    } catch (e) {
+        console.error(e);
+    }
+}
+
 export default {
     run: async (metadata: any) => {
         WA.onInit().then(async () => {
-            WA.chat.onChatMessage(
-                async (message, event) => {
-                    if (!event.author) {
-                        return;
-                    }
-
-                    try {
-                        WA.chat.startTyping({ scope: "bubble" });
-                        const chatCompletion = await fetch('https://ai.newit.works/api/v1/openai/chat/completions', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer VJD869M-CJC4KMF-JRWJFJD-Z5RNYQJ`
-                            },
-                            body: JSON.stringify({
-                                messages: [{ role: 'user', content: message }],
-                                model: WA.player.name,
-                                stream: false,
-                                temperature: 1
-                            })
-                        }).then(response => response.json());
-
-                        const response = chatCompletion.choices[0]?.message.content;
-                        if (response === null || response === undefined) {
-                            throw new Error("Custom AI returned no response: " + JSON.stringify(chatCompletion));
-                        }
-                        console.log("Custom AI response:", response);
-
-                        WA.chat.sendChatMessage(response, { scope: "bubble" });
-                        WA.chat.stopTyping({ scope: "bubble" });
-                    } catch (e) {
-                        console.error(e);
-                    }
-                },
-                { scope: "bubble" }
-            );
-
             console.log("COUCOU", metadata);
         });
 
@@ -49,61 +65,17 @@ export default {
             console.log(`User ${user.name} with UUID ${user.uuid} joined the proximity meeting.`);
             const botName = await WA.player.name;
 
-            if (!playerThreads[user.uuid]) {
-                try {
-                    const threadResponse = await fetch(`https://ai.newit.works/api/v1/workspace/${botName}/thread/new`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer JM2QWSW-FVYM0C0-KBR1MG5-PE3WSKK',
-                            'Accept-Encoding': 'gzip, deflate, br',
-                            'Accept': '*/*'
-                        },
-                        body: JSON.stringify({ userId: 6 })
-                    }).then(response => response.json());
-
-                    const threadId = threadResponse.data.thread.slug;
-                    playerThreads[user.uuid] = threadId;
-                    console.log(`Thread created with ID: ${threadId} for user ${user.uuid}`);
-                } catch (e) {
-                    console.error("Failed to create thread:", e);
-                }
+            let threadId = playerThreads[user.uuid];
+            if (!threadId) {
+                threadId = await createThread(botName, user.uuid);
             }
 
-            const threadId = playerThreads[user.uuid];
             WA.chat.onChatMessage(
                 async (message, event) => {
                     if (!event.author) {
                         return;
                     }
-
-                    try {
-                        WA.chat.startTyping({ scope: "bubble" });
-
-                        const chatResponse = await fetch(`https://ai.newit.works/api/v1/workspace/${botName}/thread/${threadId}/chat`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer JM2QWSW-FVYM0C0-KBR1MG5-PE3WSKK'
-                            },
-                            body: JSON.stringify({
-                                message: message,
-                                mode: "chat",
-                                userId: 6
-                            })
-                        }).then(response => response.json());
-
-                        const response = chatResponse.choices[0]?.message.content;
-                        if (response === null || response === undefined) {
-                            throw new Error("Custom AI returned no response: " + JSON.stringify(chatResponse));
-                        }
-                        console.log("Custom AI response:", response);
-
-                        WA.chat.sendChatMessage(response, { scope: "bubble" });
-                        WA.chat.stopTyping({ scope: "bubble" });
-                    } catch (e) {
-                        console.error(e);
-                    }
+                    await handleChatMessage(botName, threadId, message);
                 },
                 { scope: "bubble" }
             );
