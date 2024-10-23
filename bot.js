@@ -1,14 +1,12 @@
-const p = {
-  run: async (s) => {
+const i = {}, d = {
+  run: async (h) => {
     WA.onInit().then(async () => {
       WA.chat.onChatMessage(
-        async (n, a) => {
-          var o;
-          if (a.author)
+        async (o, n) => {
+          var a;
+          if (n.author)
             try {
-              WA.chat.startTyping({
-                scope: "bubble"
-              });
+              WA.chat.startTyping({ scope: "bubble" });
               const e = await fetch("https://ai.newit.works/api/v1/openai/chat/completions", {
                 method: "POST",
                 headers: {
@@ -16,75 +14,71 @@ const p = {
                   Authorization: "Bearer VJD869M-CJC4KMF-JRWJFJD-Z5RNYQJ"
                 },
                 body: JSON.stringify({
-                  messages: [{ role: "user", content: n }],
+                  messages: [{ role: "user", content: o }],
                   model: WA.player.name,
                   stream: !1,
                   temperature: 1
                 })
-              }).then((r) => r.json()), t = (o = e.choices[0]) == null ? void 0 : o.message.content;
+              }).then((s) => s.json()), t = (a = e.choices[0]) == null ? void 0 : a.message.content;
               if (t == null)
                 throw new Error("Custom AI returned no response: " + JSON.stringify(e));
-              console.log("Custom AI response:", t), WA.chat.sendChatMessage(t, {
-                scope: "bubble"
-              }), WA.chat.stopTyping({
-                scope: "bubble"
-              });
+              console.log("Custom AI response:", t), WA.chat.sendChatMessage(t, { scope: "bubble" }), WA.chat.stopTyping({ scope: "bubble" });
             } catch (e) {
               console.error(e);
             }
         },
-        {
-          scope: "bubble"
+        { scope: "bubble" }
+      ), console.log("COUCOU", h);
+    }), WA.player.proximityMeeting.onParticipantJoin().subscribe(async (o) => {
+      console.log(`User ${o.name} with UUID ${o.uuid} joined the proximity meeting.`);
+      const n = await WA.player.name;
+      if (!i[o.uuid])
+        try {
+          const t = (await fetch(`https://ai.newit.works/api/v1/workspace/${n}/thread/new`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer JM2QWSW-FVYM0C0-KBR1MG5-PE3WSKK",
+              "Accept-Encoding": "gzip, deflate, br",
+              Accept: "*/*"
+            },
+            body: JSON.stringify({ userId: 6 })
+          }).then((s) => s.json())).data.thread.slug;
+          i[o.uuid] = t, console.log(`Thread created with ID: ${t} for user ${o.uuid}`);
+        } catch (e) {
+          console.error("Failed to create thread:", e);
         }
+      const a = i[o.uuid];
+      WA.chat.onChatMessage(
+        async (e, t) => {
+          var s;
+          if (t.author)
+            try {
+              WA.chat.startTyping({ scope: "bubble" });
+              const r = await fetch(`https://ai.newit.works/api/v1/workspace/${n}/thread/${a}/chat`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: "Bearer JM2QWSW-FVYM0C0-KBR1MG5-PE3WSKK"
+                },
+                body: JSON.stringify({
+                  message: e,
+                  mode: "chat",
+                  userId: 6
+                })
+              }).then((p) => p.json()), c = (s = r.choices[0]) == null ? void 0 : s.message.content;
+              if (c == null)
+                throw new Error("Custom AI returned no response: " + JSON.stringify(r));
+              console.log("Custom AI response:", c), WA.chat.sendChatMessage(c, { scope: "bubble" }), WA.chat.stopTyping({ scope: "bubble" });
+            } catch (r) {
+              console.error(r);
+            }
+        },
+        { scope: "bubble" }
       );
-    }), console.log("COUCOU", s);
+    });
   }
 };
-WA.player.proximityMeeting.onParticipantJoin().subscribe(async (s) => {
-  console.log(`User ${s.name} with UUID ${s.uuid} joined the proximity meeting.`);
-  const n = await WA.player.name;
-  try {
-    const o = (await fetch(`https://ai.newit.works/api/v1/workspace/${n}/thread/new`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer JM2QWSW-FVYM0C0-KBR1MG5-PE3WSKK",
-        "Accept-Encoding": "gzip, deflate, br",
-        Accept: "*/*"
-      },
-      body: JSON.stringify({ userId: 6 })
-    }).then((e) => e.json())).data.thread.slug;
-    console.log(`Thread created with ID: ${o}`), WA.chat.onChatMessage(
-      async (e, t) => {
-        var r;
-        if (t.author)
-          try {
-            WA.chat.startTyping({ scope: "bubble" });
-            const c = await fetch(`https://ai.newit.works/api/v1/workspace/${n}/thread/${o}/chat`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: "Bearer JM2QWSW-FVYM0C0-KBR1MG5-PE3WSKK"
-              },
-              body: JSON.stringify({
-                message: e,
-                mode: "chat",
-                userId: 6
-              })
-            }).then((h) => h.json()), i = (r = c.choices[0]) == null ? void 0 : r.message.content;
-            if (i == null)
-              throw new Error("Custom AI returned no response: " + JSON.stringify(c));
-            console.log("Custom AI response:", i), WA.chat.sendChatMessage(i, { scope: "bubble" }), WA.chat.stopTyping({ scope: "bubble" });
-          } catch (c) {
-            console.error(c);
-          }
-      },
-      { scope: "bubble" }
-    );
-  } catch (a) {
-    console.error("Failed to create thread:", a);
-  }
-});
 export {
-  p as default
+  d as default
 };
