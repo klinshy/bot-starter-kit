@@ -3,6 +3,7 @@
 export default {
     run: async (metadata: any) => {
         const playerThreads: { [uuid: string]: string } = {};
+        let botName: string;
 
         async function createThread(botName: string, userUuid: string): Promise<string> {
             try {
@@ -66,10 +67,10 @@ export default {
 
         WA.onInit().then(async () => {
             console.log("COUCOU", metadata);
+            botName = await WA.player.name;
 
             WA.player.proximityMeeting.onParticipantJoin().subscribe(async (user) => {
                 console.log(`User ${user.name} with UUID ${user.uuid} joined the proximity meeting.`);
-                const botName = await WA.player.name;
 
                 let threadId = playerThreads[user.uuid];
                 if (!threadId) {
