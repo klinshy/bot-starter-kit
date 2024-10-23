@@ -1,5 +1,5 @@
 /// <reference types="@workadventure/iframe-api-typings" />
-
+//
 import { bootstrapExtra } from "@workadventure/scripting-api-extra";
 import {updateMyPlace} from "./places";
 import {robot} from "./robot";
