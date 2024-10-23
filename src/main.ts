@@ -6,27 +6,32 @@ export default {
 
         async function createThread(botName: string, userUuid: string): Promise<string> {
             try {
-                console.log(`Creating thread for bot: ${botName}, user: ${userUuid}`);
-                const response = await fetch(`https://ai.newit.works/api/v1/workspace/${botName}/thread/new`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer JM2QWSW-FVYM0C0-KBR1MG5-PE3WSKK',
-                        'Accept-Encoding': 'gzip, deflate, br',
-                        'Accept': '*/*'
-                    },
-                    body: JSON.stringify({ userId: 6 })
-                }).then(res => res.json());
+            console.log(`Creating thread for bot: ${botName}, user: ${userUuid}`);
+            const response = await fetch(`https://ai.newit.works/api/v1/workspace/${botName}/thread/new`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer JM2QWSW-FVYM0C0-KBR1MG5-PE3WSKK',
+                    'Accept-Encoding': 'gzip, deflate, br',
+                    'Accept': '*/*'
+                },
+                body: JSON.stringify({ userId: 6 })
+            });
 
-                const threadId = response.data.thread.slug;
-                playerThreads[userUuid] = threadId;
-                console.log(`Thread created with ID: ${threadId} for user ${userUuid}`);
-                return threadId;
-            } catch (e) {
-                console.error("Failed to create thread:", e);
-                throw e;
+            if (!response.ok) {
+                throw new Error(`Failed to create thread: ${response.statusText}`);
             }
-        }
+
+            const responseData = await response.json();
+            const threadId = responseData.thread.slug;
+            playerThreads[userUuid] = threadId;
+            console.log(`Thread created with ID: ${threadId} for user ${userUuid}`);
+            return threadId;
+                } catch (e) {
+                    console.error("Failed to create thread:", e);
+                    throw e;
+                }
+            }
 
         async function handleChatMessage(botName: string, threadId: string, message: string) {
             try {
