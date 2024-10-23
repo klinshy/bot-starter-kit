@@ -39,26 +39,28 @@ export default {
                 console.log(`Handling chat message for bot: ${botName}, thread: ${threadId}, message: ${message}`);
                 WA.chat.startTyping({ scope: "bubble" });
 
-                const response = await fetch(`https://ai.newit.works/api/v1/workspace/${botName}/thread/${threadId}/chat`, {
+                const botResponse = await fetch(`https://ai.newit.works/api/v1/workspace/kos/thread/${threadId}/chat`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': 'Bearer JM2QWSW-FVYM0C0-KBR1MG5-PE3WSKK'
+                        'Authorization': 'Bearer JM2QWSW-FVYM0C0-KBR1MG5-PE3WSKK',
+                                'Accept-Encoding': 'gzip, deflate, br',
+                        'Accept': '*/*'
                     },
                     body: JSON.stringify({
-                        message: message,
+                        message: "test",
                         mode: "chat",
                         userId: 6
                     })
                 }).then(res => res.json());
-
-                const chatResponse = response.choices[0]?.message.content;
-                if (!chatResponse) {
-                    throw new Error("Custom AI returned no response: " + JSON.stringify(response));
+                
+                const textResponse = botResponse.textResponse;
+                if (!textResponse) {
+                    throw new Error("Custom AI returned no text response: " + JSON.stringify(botResponse));
                 }
-                console.log("Custom AI response:", chatResponse);
+                console.log("Custom AI text response:", textResponse);
 
-                WA.chat.sendChatMessage(chatResponse, { scope: "bubble" });
+                WA.chat.sendChatMessage(textResponse, { scope: "bubble" });
                 WA.chat.stopTyping({ scope: "bubble" });
             } catch (e) {
                 console.error("Failed to handle chat message:", e);
