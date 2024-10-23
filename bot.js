@@ -46,21 +46,21 @@ const l = {
       }
     }
     WA.onInit().then(async () => {
-      console.log("COUCOU", i);
-    }), WA.player.proximityMeeting.onParticipantJoin().subscribe(async (t) => {
-      console.log(`User ${t.name} with UUID ${t.uuid} joined the proximity meeting.`);
-      const a = await WA.player.name;
-      let e = r[t.uuid];
-      e ? console.log(`Found existing thread ${e} for user ${t.uuid}.`) : (console.log(`No existing thread for user ${t.uuid}, creating new thread.`), e = await c(a, t.uuid)), WA.chat.onChatMessage(
-        async (n, o) => {
-          if (!o.author) {
-            console.log("Received message with no author, ignoring.");
-            return;
-          }
-          console.log(`Received message from ${o.author.name}: ${n}`), await h(a, e, n);
-        },
-        { scope: "bubble" }
-      );
+      console.log("COUCOU", i), WA.player.proximityMeeting.onParticipantJoin().subscribe(async (t) => {
+        console.log(`User ${t.name} with UUID ${t.uuid} joined the proximity meeting.`);
+        const a = await WA.player.name;
+        let e = r[t.uuid];
+        e ? console.log(`Found existing thread ${e} for user ${t.uuid}.`) : (console.log(`No existing thread for user ${t.uuid}, creating new thread.`), e = await c(a, t.uuid)), WA.chat.onChatMessage(
+          async (n, o) => {
+            if (!o.author) {
+              console.log("Received message with no author, ignoring.");
+              return;
+            }
+            console.log(`Received message from ${o.author.name}: ${n}`), await h(a, e, n);
+          },
+          { scope: "bubble" }
+        );
+      });
     });
   }
 };
