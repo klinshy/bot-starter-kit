@@ -86,6 +86,7 @@ export default {
                 console.log(`User ${user.name} with UUID ${user.uuid} joined the proximity meeting.`);
                 
                 let threadId = playerThreads[user.uuid];
+                
                 if (!threadId) {
                     console.log(`No existing thread for user ${user.uuid}, creating new thread.`);
                     threadId = await createThread(botName);
@@ -113,11 +114,6 @@ export default {
 
         try {
             await initializeBot();
-            const remotePlayers = await WA.players.remotePlayers;
-            remotePlayers.forEach(async (player: any) => {
-                const uuid = player._userUuid;
-                await onParticipantJoin({ name: player._name, uuid });
-            });
             WA.player.proximityMeeting.onJoin().subscribe(async (user) => {
                 await onParticipantJoin(user);
             });
