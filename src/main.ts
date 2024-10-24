@@ -75,7 +75,7 @@ export default {
                 console.log(`User ${user.name} with UUID ${user.uuid} joined the proximity meeting.`);
                 
                 const hashParameters = await WA.room.hashParameters;
-                const botName = hashParameters.botName || 'defaultBotName'; // Use 'defaultBotName' if no botName is provided in the hash parameters
+                const botName = hashParameters.model || 'defaultBotName'; // Use 'defaultBotName' if no model is provided in the hash parameters
 
                 let threadId = playerThreads[user.uuid];
                 if (!threadId) {
