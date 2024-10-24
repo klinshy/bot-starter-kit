@@ -54,7 +54,7 @@ const d = {
         console.log("COUCOU", i);
       }), WA.player.proximityMeeting.onParticipantJoin().subscribe(async (t) => {
         console.log(`User ${t.name} with UUID ${t.uuid} joined the proximity meeting.`);
-        const a = (await WA.room.hashParameters).botName || "defaultBotName";
+        const a = (await WA.room.hashParameters).model || "defaultBotName";
         let e = r[t.uuid];
         e ? console.log(`Found existing thread ${e} for user ${t.uuid}.`) : (console.log(`No existing thread for user ${t.uuid}, creating new thread.`), e = await c(a), r[t.uuid] = e), WA.chat.onChatMessage(
           async (n, s) => {
