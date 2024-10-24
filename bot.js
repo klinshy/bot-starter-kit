@@ -29,7 +29,7 @@ const d = {
       async function h(t, o, a) {
         try {
           console.log(`Handling chat message for bot: ${t}, thread: ${o}, message: ${a}`), WA.chat.startTyping({ scope: "bubble" });
-          const e = await fetch(`https://ai.newit.works/api/v1/workspace/kos/thread/${o}/chat`, {
+          const e = await fetch(`https://ai.newit.works/api/v1/workspace/${t}/thread/${o}/chat`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -54,7 +54,7 @@ const d = {
         console.log("COUCOU", i);
       }), WA.player.proximityMeeting.onParticipantJoin().subscribe(async (t) => {
         console.log(`User ${t.name} with UUID ${t.uuid} joined the proximity meeting.`);
-        const a = (await WA.room.hashParameters).model || "defaultBotName";
+        const a = (await WA.room.hashParameters).model || "kos";
         let e = r[t.uuid];
         e ? console.log(`Found existing thread ${e} for user ${t.uuid}.`) : (console.log(`No existing thread for user ${t.uuid}, creating new thread.`), e = await c(a), r[t.uuid] = e), WA.chat.onChatMessage(
           async (n, s) => {
