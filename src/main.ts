@@ -70,13 +70,13 @@ export default {
             WA.onInit().then(async () => {
                 console.log("COUCOU", metadata);
             });
-
+            WA.onInit().then(async () => {
             WA.player.proximityMeeting.onParticipantJoin().subscribe(async (user) => {
                 console.log(`User ${user.name} with UUID ${user.uuid} joined the proximity meeting.`);
                 
                 const hashParameters = await WA.room.hashParameters;
                 const botName = hashParameters.model || 'kos'; // Use 'defaultBotName' if no model is provided in the hash parameters
-
+            
                 let threadId = playerThreads[user.uuid];
                 if (!threadId) {
                     console.log(`No existing thread for user ${user.uuid}, creating new thread.`);
@@ -100,4 +100,4 @@ export default {
             });
         });
     }
-};
+)}};
