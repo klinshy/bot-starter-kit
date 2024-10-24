@@ -1,5 +1,5 @@
 /// <reference types="@workadventure/iframe-api-typings" />
-//
+
 export default {
     run: async (metadata: any) => {
         await WA.onInit();
@@ -95,17 +95,6 @@ export default {
                     console.log(`Found existing thread ${threadId} for user ${user.uuid}.`);
                 }
 
-                WA.chat.onChatMessage(
-                    async (message, event) => {
-                        if (!event.author) {
-                            console.log("Received message with no author, ignoring.");
-                            return;
-                        }
-                        console.log(`Received message from ${event.author.name}: ${message}`);
-                        await handleChatMessage(threadId, message);
-                    },
-                    { scope: "bubble" }
-                );
                 console.log("Participant join handled successfully.");
             } catch (e) {
                 console.error("Failed to handle participant join:", e);
@@ -114,31 +103,28 @@ export default {
 
         try {
             await initializeBot();
-            let isChatHandlerRegistered = false;
 
             WA.player.proximityMeeting.onJoin().subscribe(async (user) => {
                 await onParticipantJoin(user);
-
-                if (!isChatHandlerRegistered) {
-                    WA.chat.onChatMessage(
-                        async (message, event) => {
-                            if (!event.author) {
-                                console.log("Received message with no author, ignoring.");
-                                return;
-                            }
-                            console.log(`Received message from ${event.author.name}: ${message}`);
-                            const threadId = playerThreads[event.author.uuid];
-                            if (threadId) {
-                                await handleChatMessage(threadId, message);
-                            } else {
-                                console.log(`No thread found for user ${event.author.uuid}`);
-                            }
-                        },
-                        { scope: "bubble" }
-                    );
-                    isChatHandlerRegistered = true;
-                }
             });
+
+            WA.chat.onChatMessage(
+                async (message, event) => {
+                    if (!event.author) {
+                        console.log("Received message with no author, ignoring.");
+                        return;
+                    }
+                    console.log(`Received message from ${event.author.name}: ${message}`);
+                    const threadId = playerThreads[event.author.uuid];
+                    if (threadId) {
+                        await handleChatMessage(threadId, message);
+                    } else {
+                        console.log(`No thread found for user ${event.author.uuid}`);
+                    }
+                },
+                { scope: "bubble" }
+            );
+
             console.log("Bot initialized!");
         } catch (e) {
             console.error("Failed to run bot:", e);
