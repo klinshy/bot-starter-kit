@@ -1,4 +1,4 @@
-const p = {
+const g = {
   run: async (i) => {
     await WA.onInit(), await WA.players.configureTracking({ players: !0 });
     const s = {};
@@ -74,7 +74,7 @@ const p = {
       }
     }
     try {
-      await l(), WA.player.proximityMeeting.onParticipantJoin().subscribe(async (e) => {
+      await l(), WA.player.proximityMeeting.onJoin().subscribe(async (e) => {
         await h(e);
       }), console.log("Bot initialized!");
     } catch (e) {
@@ -83,5 +83,5 @@ const p = {
   }
 };
 export {
-  p as default
+  g as default
 };
