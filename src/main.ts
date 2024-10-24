@@ -39,7 +39,7 @@ export default {
                     console.log(`Handling chat message for bot: ${botName}, thread: ${threadId}, message: ${message}`);
                     WA.chat.startTyping({ scope: "bubble" });
 
-                    const botResponse = await fetch(`https://ai.newit.works/api/v1/workspace/kos/thread/${threadId}/chat`, {
+                    const botResponse = await fetch(`https://ai.newit.works/api/v1/workspace/${botName}/thread/${threadId}/chat`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -75,7 +75,7 @@ export default {
                 console.log(`User ${user.name} with UUID ${user.uuid} joined the proximity meeting.`);
                 
                 const hashParameters = await WA.room.hashParameters;
-                const botName = hashParameters.model || 'defaultBotName'; // Use 'defaultBotName' if no model is provided in the hash parameters
+                const botName = hashParameters.model || 'kos'; // Use 'defaultBotName' if no model is provided in the hash parameters
 
                 let threadId = playerThreads[user.uuid];
                 if (!threadId) {
