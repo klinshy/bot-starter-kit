@@ -74,7 +74,9 @@ const p = {
       }
     }
     try {
-      await l(), WA.player.proximityMeeting.onParticipantJoin().subscribe(h), console.log("Bot initialized!");
+      await l(), WA.player.proximityMeeting.onParticipantJoin().subscribe(async (e) => {
+        await h(e);
+      }), console.log("Bot initialized!");
     } catch (e) {
       console.error("Failed to run bot:", e);
     }
