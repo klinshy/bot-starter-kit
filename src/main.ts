@@ -17,11 +17,13 @@ export default {
                     },
                     body: JSON.stringify({ userId: 6 })
                 });
+                if (!response.ok) {
+                    throw new Error(`Failed to create thread: ${response.statusText}`);
+                }
                 const responseData = await response.json();
                 const threadId = responseData.thread.slug;
-                console.log(threadId);
+                console.log(`Thread created with ID: ${threadId}`);
                 return threadId;
-                
             } catch (e) {
                 console.error("Failed to create thread:", e);
                 throw e;
@@ -38,16 +40,16 @@ export default {
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': 'Bearer JM2QWSW-FVYM0C0-KBR1MG5-PE3WSKK',
-                                'Accept-Encoding': 'gzip, deflate, br',
+                        'Accept-Encoding': 'gzip, deflate, br',
                         'Accept': '*/*'
                     },
                     body: JSON.stringify({
-                        message: "test",
+                        message: message,
                         mode: "chat",
                         userId: 6
                     })
                 }).then(res => res.json());
-                
+
                 const textResponse = botResponse.textResponse;
                 if (!textResponse) {
                     throw new Error("Custom AI returned no text response: " + JSON.stringify(botResponse));
@@ -73,6 +75,7 @@ export default {
             if (!threadId) {
                 console.log(`No existing thread for user ${user.uuid}, creating new thread.`);
                 threadId = await createThread(botName);
+                playerThreads[user.uuid] = threadId;
             } else {
                 console.log(`Found existing thread ${threadId} for user ${user.uuid}.`);
             }

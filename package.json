@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.14.8",
-    "@workadventure/iframe-api-typings": "^1.19.7",
+    "@workadventure/iframe-api-typings": "^1.21",
     "typescript": "^5.2.2",
     "vite": "^5.3.1"
   }
