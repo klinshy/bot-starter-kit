@@ -85,15 +85,10 @@ export default {
             try {
                 console.log(`User ${user.name} with UUID ${user.uuid} joined the proximity meeting.`);
                 
-                let threadId = playerThreads[user.uuid];
-                
-                if (!threadId) {
-                    console.log(`No existing thread for user ${user.uuid}, creating new thread.`);
-                    threadId = await createThread(botName);
-                    playerThreads[user.uuid] = threadId;
-                } else {
-                    console.log(`Found existing thread ${threadId} for user ${user.uuid}.`);
-                }
+                // Always create a new thread when a user joins
+                console.log(`Creating new thread for user ${user.uuid}.`);
+                const threadId = await createThread(botName);
+                playerThreads[user.uuid] = threadId;
 
                 console.log("Participant join handled successfully.");
             } catch (e) {
