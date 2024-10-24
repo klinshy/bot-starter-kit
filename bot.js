@@ -57,9 +57,9 @@ const u = {
     }
     async function h(e) {
       try {
-        console.log(`User ${e.name} with UUID ${e.uuid} joined the proximity meeting.`);
-        let o = s[e.uuid];
-        o ? console.log(`Found existing thread ${o} for user ${e.uuid}.`) : (console.log(`No existing thread for user ${e.uuid}, creating new thread.`), o = await i(n), s[e.uuid] = o), console.log("Participant join handled successfully.");
+        console.log(`User ${e.name} with UUID ${e.uuid} joined the proximity meeting.`), console.log(`Creating new thread for user ${e.uuid}.`);
+        const o = await i(n);
+        s[e.uuid] = o, console.log("Participant join handled successfully.");
       } catch (o) {
         console.error("Failed to handle participant join:", o);
       }
