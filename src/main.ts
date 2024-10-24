@@ -113,6 +113,11 @@ export default {
 
         try {
             await initializeBot();
+            const remotePlayers = await WA.players.remotePlayers;
+            remotePlayers.forEach(async (player: any) => {
+                const uuid = player._userUuid;
+                await onParticipantJoin({ name: player._name, uuid });
+            });
             WA.player.proximityMeeting.onJoin().subscribe(async (user) => {
                 await onParticipantJoin(user);
             });
@@ -122,4 +127,3 @@ export default {
         }
     }
 };
-
