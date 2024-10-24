@@ -8,6 +8,7 @@ export default {
 
         const playerThreads: { [uuid: string]: string } = {};
         let botName: string;
+        let isChatHandlerRegistered = false;
 
         async function createThread(botName: string): Promise<string> {
             try {
@@ -103,22 +104,25 @@ export default {
                 await onParticipantJoin(user);
             });
 
-            WA.chat.onChatMessage(
-                async (message, event) => {
-                    if (!event.author) {
-                        console.log("Received message with no author, ignoring.");
-                        return;
-                    }
-                    console.log(`Received message from ${event.author.name}: ${message}`);
-                    const threadId = playerThreads[event.author.uuid];
-                    if (threadId) {
-                        await handleChatMessage(threadId, message);
-                    } else {
-                        console.log(`No thread found for user ${event.author.uuid}`);
-                    }
-                },
-                { scope: "bubble" }
-            );
+            if (!isChatHandlerRegistered) {
+                WA.chat.onChatMessage(
+                    async (message, event) => {
+                        if (!event.author) {
+                            console.log("Received message with no author, ignoring.");
+                            return;
+                        }
+                        console.log(`Received message from ${event.author.name}: ${message}`);
+                        const threadId = playerThreads[event.author.uuid];
+                        if (threadId) {
+                            await handleChatMessage(threadId, message);
+                        } else {
+                            console.log(`No thread found for user ${event.author.uuid}`);
+                        }
+                    },
+                    { scope: "bubble" }
+                );
+                isChatHandlerRegistered = true;
+            }
 
             console.log("Bot initialized!");
         } catch (e) {
