@@ -113,7 +113,7 @@ export default {
 
         try {
             await initializeBot();
-            WA.player.proximityMeeting.onParticipantJoin().subscribe(async (user) => {
+            WA.player.proximityMeeting.onJoin().subscribe(async (user) => {
                 await onParticipantJoin(user);
             });
             console.log("Bot initialized!");
@@ -122,3 +122,4 @@ export default {
         }
     }
 };
+
