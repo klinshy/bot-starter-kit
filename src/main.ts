@@ -2,6 +2,7 @@
 
 export default {
     run: async (metadata: any) => {
+        WA.onInit().then(async () => {
         const playerThreads: { [uuid: string]: string } = {};
 
         async function createThread(botName: string): Promise<string> {
@@ -92,5 +93,5 @@ export default {
                 { scope: "bubble" }
             );
         });
-    }
-};
+    });
+}};
