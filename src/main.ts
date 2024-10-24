@@ -3,6 +3,8 @@
 export default {
     run: async (metadata: any) => {
         WA.onInit().then(async () => {
+            await WA.players.configureTracking({
+                players: true});
         const playerThreads: { [uuid: string]: string } = {};
 
         async function createThread(botName: string): Promise<string> {
