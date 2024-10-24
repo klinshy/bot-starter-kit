@@ -81,7 +81,7 @@ export default {
             }
         }
 
-        async function onParticipantJoin(user: any) {
+        async function onParticipantJoin(user: any) { 
             try {
                 console.log(`User ${user.name} with UUID ${user.uuid} joined the proximity meeting.`);
                 
@@ -113,7 +113,9 @@ export default {
 
         try {
             await initializeBot();
-            WA.player.proximityMeeting.onParticipantJoin().subscribe(onParticipantJoin);
+            WA.player.proximityMeeting.onParticipantJoin().subscribe(async (user) => {
+                await onParticipantJoin(user);
+            });
             console.log("Bot initialized!");
         } catch (e) {
             console.error("Failed to run bot:", e);
