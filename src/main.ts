@@ -72,7 +72,7 @@ export default {
         async function initializeBot() {
             try {
                 console.log("Initializing bot with metadata:", metadata);
-                const hashParameters = await WA.room.hashParameters;
+                const hashParameters = WA.room.hashParameters;
                 botName = hashParameters.model || 'kos'; // Use 'defaultBotName' if no model is provided in the hash parameters
                 console.log(botName + " is ready!");
                 console.log("Bot initialized successfully.");
@@ -114,8 +114,30 @@ export default {
 
         try {
             await initializeBot();
+            let isChatHandlerRegistered = false;
+
             WA.player.proximityMeeting.onJoin().subscribe(async (user) => {
                 await onParticipantJoin(user);
+
+                if (!isChatHandlerRegistered) {
+                    WA.chat.onChatMessage(
+                        async (message, event) => {
+                            if (!event.author) {
+                                console.log("Received message with no author, ignoring.");
+                                return;
+                            }
+                            console.log(`Received message from ${event.author.name}: ${message}`);
+                            const threadId = playerThreads[event.author.uuid];
+                            if (threadId) {
+                                await handleChatMessage(threadId, message);
+                            } else {
+                                console.log(`No thread found for user ${event.author.uuid}`);
+                            }
+                        },
+                        { scope: "bubble" }
+                    );
+                    isChatHandlerRegistered = true;
+                }
             });
             console.log("Bot initialized!");
         } catch (e) {
