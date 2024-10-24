@@ -1,6 +1,9 @@
 const d = {
   run: async (r) => {
     WA.onInit().then(async () => {
+      await WA.players.configureTracking({
+        players: !0
+      });
       const s = {};
       async function i(t) {
         try {
