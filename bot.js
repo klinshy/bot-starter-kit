@@ -1,89 +1,84 @@
-const p = {
-  run: async (i) => {
+const C = {
+  run: async (h) => {
     await WA.onInit(), await WA.players.configureTracking({ players: !0 });
-    const s = {};
-    let n, r = !1;
-    async function c(e) {
+    let n, c = !1;
+    async function d(e, t) {
+      var l;
+      const p = "https://api-production-db6f.up.railway.app/v1/chat-messages", m = "Bearer app-C5X1afuv6miMFMkFS3dawHjt", y = {
+        inputs: {},
+        query: e,
+        response_mode: "streaming",
+        conversation_id: "",
+        user: t,
+        files: []
+      };
       try {
-        console.log(`Creating thread for bot: ${e}`);
-        const t = await fetch(`https://ai.newit.works/api/v1/workspace/${e}/thread/new`, {
+        console.log(`Handling chat message for bot: ${n}, message: ${e}`), WA.chat.startTyping({ scope: "bubble" });
+        const o = await fetch(p, {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer JM2QWSW-FVYM0C0-KBR1MG5-PE3WSKK",
-            "Accept-Encoding": "gzip, deflate, br",
-            Accept: "*/*"
+            Authorization: m,
+            "Content-Type": "application/json"
           },
-          body: JSON.stringify({ userId: 6 })
+          body: JSON.stringify(y)
         });
-        if (!t.ok)
-          throw new Error(`Failed to create thread: ${t.statusText}`);
-        const a = (await t.json()).thread.slug;
-        return console.log(`Thread created with ID: ${a}`), a;
-      } catch (t) {
-        throw console.error("Failed to create thread:", t), t;
-      }
-    }
-    async function l(e, t) {
-      try {
-        console.log(`Handling chat message for bot: ${n}, thread: ${e}, message: ${t}`), WA.chat.startTyping({ scope: "bubble" });
-        const o = await fetch(`https://ai.newit.works/api/v1/workspace/${n}/thread/${e}/chat`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer JM2QWSW-FVYM0C0-KBR1MG5-PE3WSKK",
-            "Accept-Encoding": "gzip, deflate, br",
-            Accept: "*/*"
-          },
-          body: JSON.stringify({
-            message: t,
-            mode: "chat",
-            userId: 6
-          })
-        }).then((u) => u.json()), a = o.textResponse;
-        if (!a)
-          throw new Error("Custom AI returned no text response: " + JSON.stringify(o));
-        console.log("Custom AI text response:", a), WA.chat.sendChatMessage(a, { scope: "bubble" }), WA.chat.stopTyping({ scope: "bubble" }), console.log("Chat message handled successfully.");
+        if (!o.ok)
+          throw new Error(`Failed to handle chat message: ${o.statusText}`);
+        const i = (l = o.body) == null ? void 0 : l.getReader(), f = new TextDecoder();
+        let r = "";
+        for (; ; ) {
+          const { done: b, value: w } = await (i == null ? void 0 : i.read());
+          if (b) break;
+          const A = f.decode(w, { stream: !0 }).split(`
+`);
+          for (const a of A)
+            if (a.trim()) {
+              const W = a.startsWith("data: ") ? a.slice(6) : a;
+              try {
+                const s = JSON.parse(W);
+                s.answer && (r += s.answer + " ");
+              } catch (s) {
+                console.error("Error parsing chunk:", s);
+              }
+            }
+        }
+        console.log("Custom AI text response:", r.trim()), WA.chat.sendChatMessage(r.trim(), { scope: "bubble" }), WA.chat.stopTyping({ scope: "bubble" }), console.log("Chat message handled successfully.");
       } catch (o) {
         console.error("Failed to handle chat message:", o);
       }
     }
-    async function h() {
+    async function u() {
       try {
-        console.log("Initializing bot with metadata:", i), n = WA.room.hashParameters.model || "kos", console.log(n + " is ready!"), console.log("Bot initialized successfully.");
+        console.log("Initializing bot with metadata:", h), n = WA.room.hashParameters.model || "kos", console.log(n + " is ready!"), console.log("Bot initialized successfully.");
       } catch (e) {
         console.error("Failed to initialize bot:", e);
       }
     }
-    async function d(e) {
+    async function g(e) {
       try {
-        console.log(`User ${e.name} with UUID ${e.uuid} joined the proximity meeting.`), console.log(`Creating new thread for user ${e.uuid}.`);
-        const t = await c(n);
-        s[e.uuid] = t, console.log("Participant join handled successfully.");
+        console.log(`User ${e.name} with UUID ${e.uuid} joined the proximity meeting.`), console.log("Participant join handled successfully.");
       } catch (t) {
         console.error("Failed to handle participant join:", t);
       }
     }
     try {
-      await h(), WA.player.proximityMeeting.onJoin().subscribe(async (e) => {
-        await d(e);
-      }), r || (WA.chat.onChatMessage(
+      await u(), WA.player.proximityMeeting.onJoin().subscribe(async (e) => {
+        await g(e);
+      }), c || (WA.chat.onChatMessage(
         async (e, t) => {
           if (!t.author) {
             console.log("Received message with no author, ignoring.");
             return;
           }
-          console.log(`Received message from ${t.author.name}: ${e}`);
-          const o = s[t.author.uuid];
-          o ? await l(o, e) : console.log(`No thread found for user ${t.author.uuid}`);
+          console.log(`Received message from ${t.author.name}: ${e}`), await d(e, t.author.uuid);
         },
         { scope: "bubble" }
-      ), r = !0), console.log("Bot initialized!");
+      ), c = !0), console.log("Bot initialized!");
     } catch (e) {
       console.error("Failed to run bot:", e);
     }
   }
 };
 export {
-  p as default
+  C as default
 };
