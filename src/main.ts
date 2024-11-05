@@ -8,15 +8,18 @@ export default {
         let botName: string;
         let isChatHandlerRegistered = false;
 
+        // Map to store conversation_id per user
+        let userConversations: { [key: string]: string } = {};
+
         async function handleChatMessage(message: string, userUuid: string) {
             const url = 'https://api-production-db6f.up.railway.app/v1/chat-messages';
-            const apiKey = 'Bearer app-C5X1afuv6miMFMkFS3dawHjt';
+            const apiKey = 'Bearer YOUR_API_KEY_HERE'; // Replace with your actual API key
 
             const requestData = {
                 inputs: {},
                 query: message,
                 response_mode: "streaming",
-                conversation_id: "",
+                conversation_id: userConversations[userUuid] || "", // Use existing conversation_id or blank
                 user: userUuid,
                 files: []
             };
@@ -54,7 +57,11 @@ export default {
                             try {
                                 const data = JSON.parse(jsonString);
                                 if (data.answer) {
-                                    fullMessage += data.answer + " ";
+                                    fullMessage += data.answer;
+                                }
+                                // Store conversation_id and message_id
+                                if (data.conversation_id) {
+                                    userConversations[userUuid] = data.conversation_id;
                                 }
                             } catch (error) {
                                 console.error("Error parsing chunk:", error);
