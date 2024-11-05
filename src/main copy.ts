@@ -131,5 +131,3 @@ export default {
         }
     }
 };
-
-WA.nav.getCowebSites()
