@@ -1,76 +1,77 @@
-const C = {
-  run: async (h) => {
+const P = {
+  run: async (d) => {
     await WA.onInit(), await WA.players.configureTracking({ players: !0 });
-    let n, c = !1;
-    async function d(e, t) {
-      var l;
-      const p = "https://api-production-db6f.up.railway.app/v1/chat-messages", m = "Bearer app-C5X1afuv6miMFMkFS3dawHjt", y = {
+    let n, c = !1, l = {};
+    async function u(e, o) {
+      var h;
+      const y = "https://api-production-db6f.up.railway.app/v1/chat-messages", m = "Bearer YOUR_API_KEY_HERE", f = {
         inputs: {},
         query: e,
         response_mode: "streaming",
-        conversation_id: "",
-        user: t,
+        conversation_id: l[o] || "",
+        // Use existing conversation_id or blank
+        user: o,
         files: []
       };
       try {
         console.log(`Handling chat message for bot: ${n}, message: ${e}`), WA.chat.startTyping({ scope: "bubble" });
-        const o = await fetch(p, {
+        const a = await fetch(y, {
           method: "POST",
           headers: {
             Authorization: m,
             "Content-Type": "application/json"
           },
-          body: JSON.stringify(y)
+          body: JSON.stringify(f)
         });
-        if (!o.ok)
-          throw new Error(`Failed to handle chat message: ${o.statusText}`);
-        const i = (l = o.body) == null ? void 0 : l.getReader(), f = new TextDecoder();
+        if (!a.ok)
+          throw new Error(`Failed to handle chat message: ${a.statusText}`);
+        const i = (h = a.body) == null ? void 0 : h.getReader(), b = new TextDecoder();
         let r = "";
         for (; ; ) {
-          const { done: b, value: w } = await (i == null ? void 0 : i.read());
-          if (b) break;
-          const A = f.decode(w, { stream: !0 }).split(`
+          const { done: w, value: A } = await (i == null ? void 0 : i.read());
+          if (w) break;
+          const W = b.decode(A, { stream: !0 }).split(`
 `);
-          for (const a of A)
-            if (a.trim()) {
-              const W = a.startsWith("data: ") ? a.slice(6) : a;
+          for (const s of W)
+            if (s.trim()) {
+              const C = s.startsWith("data: ") ? s.slice(6) : s;
               try {
-                const s = JSON.parse(W);
-                s.answer && (r += s.answer + " ");
-              } catch (s) {
-                console.error("Error parsing chunk:", s);
+                const t = JSON.parse(C);
+                t.answer && (r += t.answer), t.conversation_id && (l[o] = t.conversation_id);
+              } catch (t) {
+                console.error("Error parsing chunk:", t);
               }
             }
         }
         console.log("Custom AI text response:", r.trim()), WA.chat.sendChatMessage(r.trim(), { scope: "bubble" }), WA.chat.stopTyping({ scope: "bubble" }), console.log("Chat message handled successfully.");
-      } catch (o) {
-        console.error("Failed to handle chat message:", o);
+      } catch (a) {
+        console.error("Failed to handle chat message:", a);
       }
     }
-    async function u() {
+    async function g() {
       try {
-        console.log("Initializing bot with metadata:", h), n = WA.room.hashParameters.model || "kos", console.log(n + " is ready!"), console.log("Bot initialized successfully.");
+        console.log("Initializing bot with metadata:", d), n = WA.room.hashParameters.model || "kos", console.log(n + " is ready!"), console.log("Bot initialized successfully.");
       } catch (e) {
         console.error("Failed to initialize bot:", e);
       }
     }
-    async function g(e) {
+    async function p(e) {
       try {
         console.log(`User ${e.name} with UUID ${e.uuid} joined the proximity meeting.`), console.log("Participant join handled successfully.");
-      } catch (t) {
-        console.error("Failed to handle participant join:", t);
+      } catch (o) {
+        console.error("Failed to handle participant join:", o);
       }
     }
     try {
-      await u(), WA.player.proximityMeeting.onJoin().subscribe(async (e) => {
-        await g(e);
+      await g(), WA.player.proximityMeeting.onJoin().subscribe(async (e) => {
+        await p(e);
       }), c || (WA.chat.onChatMessage(
-        async (e, t) => {
-          if (!t.author) {
+        async (e, o) => {
+          if (!o.author) {
             console.log("Received message with no author, ignoring.");
             return;
           }
-          console.log(`Received message from ${t.author.name}: ${e}`), await d(e, t.author.uuid);
+          console.log(`Received message from ${o.author.name}: ${e}`), await u(e, o.author.uuid);
         },
         { scope: "bubble" }
       ), c = !0), console.log("Bot initialized!");
@@ -80,5 +81,5 @@ const C = {
   }
 };
 export {
-  C as default
+  P as default
 };
